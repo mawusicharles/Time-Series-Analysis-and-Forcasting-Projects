@@ -1,0 +1,23 @@
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+title: "Economic Policy Uncertainty and Tourism Outputs: A sectoral Analysis of the U.S. Travel and Tourism Industry"
+author: "Charles MAWUSI"
+date: "19/03/2022"
+output: html_document
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+### Processing Data 
+
+```{r Load data}
+Research_data <-read.csv(file = file.choose(), header = TRUE)
+sum(is.na(Research_data))
+head(Research_data)
+
+```
+
+
+
