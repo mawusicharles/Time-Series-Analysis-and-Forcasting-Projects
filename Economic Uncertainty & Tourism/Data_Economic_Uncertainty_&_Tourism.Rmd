@@ -10,13 +10,12 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```
 
-### Processing Data 
+### Data Exploration and Processing  
 
 ```{r Load data}
 Research_data <-read.csv(file = file.choose(), header = TRUE)
 sum(is.na(Research_data))
 head(Research_data)
-
 ```
 
 
