@@ -1,1 +1,113 @@
+---
+title: " Climate Policy Uncertaity & Renewable Energy Consumption"
+author: "Charles MAWUSI"
+date: "19/03/2022"
+output: 
+  pdf_document:
+    latex_engine: pdflatex
+--- 
+### Paper Brief  
+
+In this paper I employ a time series methodology to explore the long and short run effects of climate policy ambiguity on renewable energy consumption in the United States. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, 
+                      message = FALSE, 
+                      eval = TRUE, 
+                      comment = "", 
+                      warning = FALSE,
+                      fig.width = 6, 
+                      fig.height = 6,
+                      fig.align='center',
+                      dpi = 100,
+                      bootstrap.thumbnail = FALSE)
+options(width = 100)
+```
+### Data processing 
+
+```{r libraries}
+library(tidyverse)
+library(dplyr)
+library(stargazer)
+library(gtsummary)
+library(timetk)
+library(formatR) # use to format output code, specifically set to allow long codes to fit on page.
+
+```
+
+
+```{r rawdataProcessing}
+Research_Data<-read.csv(file = file.choose(), header = T, sep=",")
+
+#   str(Research_Data)
+#   Research_Data %>%
+#   select(everything()) %>%
+#   summarise_all(funs(Missing_Values=sum(is.na(.)))) %>% 
+#   glimpse()
+
+Research_Data<-Research_Data %>% select(-c(1:3))
+
+Research_Data %>% as.data.frame() %>%
+    stargazer(type = 'text')
+
+library(lubridate)
+
+Research_Data<-Research_Data %>%
+  mutate(date_seq =seq(ymd('2000-01-01'), ymd('2021-11-21'), by = 'months'))
+
+```
+
+```{r logtransformed_data}
+
+# Log transformation of all variables 
+
+Research_data_ln<-Research_Data %>% 
+    mutate_at(1:17, list(ln = ~ log(.))) %>% select(18:35) %>% glimpse()
+
+# summary statistics of log transformed data 
+
+Research_data_ln %>% as.data.frame() %>%
+    stargazer(type = 'text')  
+```
+### PLoting time series  
+
+
+```{r Timeseriesplots tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+# sub-setting the time series for plots 
+
+Total_Ren_Cons<-ts(Research_Data$Total_Renewable_Energy_Consumption, start = c(2000, 1), frequency = 12)
+Hydro_Ren_Cons<-ts(Research_Data$Hydro_Consumption , start = c(2000, 1), frequency = 12)
+Biofuel_Ren_Cons<-ts(Research_Data$Biofuelss_consumption , start = c(2000, 1), frequency = 12)
+Geothermal_Ren_Cons<-ts(Research_Data$Geothermal_consumption , start = c(2000, 1), frequency = 12)
+Solar_Ren_Cons<-ts(Research_Data$Solar_Energy_consumption , start = c(2000, 1), frequency = 12)
+Biomas_Ren_Cons<-ts(Research_Data$Biomas_consumption , start = c(2000, 1), frequency = 12)
+Waste_Ren_Cons<-ts(Research_Data$Waste_energy_consumption , start = c(2000, 1), frequency = 12) 
+Wind_Ren_Cons<-ts(Research_Data$Wind_Energy_consumption , start = c(2000, 1), frequency = 12) 
+cpu_time_Ren_Cons<-ts(Research_Data$CPU_INDEX , start = c(2000, 1), frequency = 12) 
+
+plot(cpu_time_Ren_Cons, main="U.S Climate Policy Uncertainty", plot.type = "single", xlab="date", ylab="CPU Index")
+
+plot(Total_Ren_Cons, main="Total Renewable Energy Consumption", plot.type = "single", xlab="date", ylab="Total Renewable Energy Consumption")
+
+plot(cbind( Hydro_Ren_Cons, Biofuel_Ren_Cons, Geothermal_Ren_Cons, Solar_Ren_Cons, Biomas_Ren_Cons,Waste_Ren_Cons,Wind_Ren_Cons), plot.type = "single", col = 1:7, ylab=" Renewable Energy Consumption ", xlab="date", main="U.S Renewable Energy Consusmption")
+
+legend(2000, 450, legend=c("Hydro", "Biofuel", "Geothermal", "Solar", "Biomas", "Waste", "Wind"), col=1:7, lty=1:2, cex=0.8)
+
+
+```
+### Stationarity test 
+
+
+```{r stationarity}
+library(urca)
+# use the log transformed data 
+
+Adf_Total_cons<-ur.df(Research_data_ln$Total_Renewable_Energy_Consumption_ln, type = "none", selectlags = "AIC")
+summary(Adf_Pass)
+Adf_Total_cons_drift<-ur.df(Research_data_ln$Total_Renewable_Energy_Consumption_ln, type = "drift", selectlags = "AIC")
+Adf_Total_cons_const<-ur.df(Research_data_ln$Total_Renewable_Energy_Consumption_ln, type = "trend", selectlags = "AIC")
+
+
+```
+
 
