@@ -1,4 +1,6 @@
+# Code By Charles Mawusi 
 
+setwd("~/Desktop/Git_Folder /Time-Series-Analysis-and-Forcasting-Projects/Immigration And Tourism") 
 data<-read.csv("Research_Data.csv")
 head(data)
 # install.packages("tidyverse")
@@ -6,7 +8,7 @@ head(data)
 library(tidyverse)
 
 # Plotting Graphs Raw data 
-data_raw<- data %>% select(arrivalcad, industprocad, repexcad, spexrmexuk, impu, imfear  )  # selected variables to plot 
+data_raw<- data %>% select("arrivalcad", "industprocad", "repexcad", "spexrmexuk", "impu", "imfear"  )  # selected variables to plot 
 IMF <-ts(data_raw$imfear, start = c(1996, 1), frequency = 4)
 IMPU <-ts(data_raw$impu, start = c(1996, 1), frequency = 4)
 Tour_Cand<-ts(data_raw$arrivalcad, start = c(1996, 1), frequency = 4)
@@ -14,16 +16,16 @@ plot(cbind(IMF, IMPU), plot.type = "single", col = c("blue", "red"), ylab="IMPU 
 plot(Tour_Cand, plot.type = "single", col = "blue", ylab="TAFC ", xlab=" Date", main="Tourist Arrivals from Canada")
 
 # Research Variables 
-Research_Data<-data %>% select(data, lnindustprocad, lnrepexcad, lnspexrmexuk, lnimpu, lnimfear )
+library(dplyr)
+Research_Data<-data %>% select("lnarrivalcad" , "lnindustprocad", "lnrepexcad", "lnspexrmexuk", "lnimpu", "lnimfear" )
 head(Research_Data)
-
 # install.packages("stargazer")
 library(stargazer)
 stargazer(Research_Data)# latex summary stats 
 
 # Adding the data/time frequency 
 Research_Data<-ts(Research_Data, start = c(1996, 1), frequency = 4)
-
+head(Research_Data)
 ### Augmented Dickey-Fuller at levels 
 
 # install.packages("urca")
@@ -82,3 +84,19 @@ table_constant_diff<-cbind(colnames(Research_Data), Adf_stat_constant,PP_stat_co
 table_constant_diff
 colnames(table_constant_diff)[1:5]<-c("Variables","DF Statistics", "Phillips-Perron ","ADF Statistics", "Phillips-Perron")
 table_constant_diff
+
+path <- "~/Desktop/Immigration fears and Policy Uncertainty on TourismAnnals of Tourism/New Rewrite to submit 2022/R Code Results "
+write.csv(table_constant, file.path(path, "ADF_PP_Levels_results.csv"), row.names=FALSE)
+write.csv(table_constant_diff, file.path(path, "ADF_PP_Difference_results.csv"), row.names=FALSE)
+
+# Bai Perron Test Best to use stata to compute the real regression 
+# install.packages("tseries")
+# install.packages("strucchange")
+library(tseries)
+library(strucchange)
+library(dplyr)
+
+IMPUBai<-breakpoints(IMPU~1, h=10)
+summary(IMPUBai)
+IMFUBai<-breakpoints(IMF~1, h=10)
+summary(IMFUBai)
