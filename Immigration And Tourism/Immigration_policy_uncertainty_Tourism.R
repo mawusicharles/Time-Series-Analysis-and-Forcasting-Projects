@@ -100,3 +100,5 @@ IMPUBai<-breakpoints(IMPU~1, h=10)
 summary(IMPUBai)
 IMFUBai<-breakpoints(IMF~1, h=10)
 summary(IMFUBai)
+
+
