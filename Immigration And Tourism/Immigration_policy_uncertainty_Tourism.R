@@ -92,7 +92,7 @@ write.csv(table_constant_diff, file.path(path, "ADF_PP_Difference_results.csv"),
 # Bai Perron Test Best to use stata to compute the real regression 
 # install.packages("tseries")
 # install.packages("strucchange")
-library(tseries)
+
 library(strucchange)
 library(dplyr)
 
@@ -101,4 +101,15 @@ summary(IMPUBai)
 IMFUBai<-breakpoints(IMF~1, h=10)
 summary(IMFUBai)
 
+# BDS test for linearity 
+Research_Data<-as.data.frame(Research_Data)
+library(tseries)
 
+bds.test(Research_Data$lnarrivalcad , m=6)
+bds.test(Research_Data$lnimpu, m=6)
+bds.test(Research_Data$lnimfear, m=6)
+# creating structural break dummies 
+Research_Data$date_ts<-seq(as.Date("1996/1/1"), as.Date("2019/12/1"), by = "quarter")
+Research_Data$IMFDummy<- ifelse(Research_Data$date_ts>="2008-07-01", 1, 0)
+Research_Data$IMPUDummy<- ifelse(Research_Data$date_ts>="2010-07-01", 1, 0)
+summary(Research_Data)
