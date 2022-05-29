@@ -180,6 +180,24 @@ mult_ARDL_MFI_MODEL_Coint
 mult_ARDL_MFI_MODEL_Ecm<-multipliers(ARDL_MFI_MODEL_coint_ECM) # long run estimate 
 mult_ARDL_MFI_MODEL_Ecm
 
+# Stability test 
+install.packages("dLagM")
+library(dLagM)
+ARDL_IMPU_STABILITY<-ardlBound(lnarrivalcad ~ lnimpu  +lnindustprocad + lnrepexcad + lnspexrmexuk|IMPUDummy, data = Research_Data, case = 3, p=1, max.q=4, ECM=FALSE, stability = TRUE)
+ARDL_IMPU_STABILITY$F.stat
+ARDL_IMPU_STABILITY$bg # Nulll hypotheis is no serial Correlation 
+ARDL_IMPU_STABILITY$lb # null our model does not show lack of fit 
+ARDL_IMPU_STABILITY$bp # Homoskedasticity 
+ARDL_IMPU_STABILITY$sp # Null Normality 
+
+################# MFI 
+
+RDL_MFI_STABILITY<-ardlBound(lnarrivalcad ~ lnimfear  +lnindustprocad + lnrepexcad + lnspexrmexuk|IMFDummy, data = Research_Data, case = 3, p=1, max.q=4, ECM=FALSE, stability = TRUE)
+RDL_MFI_STABILITY$F.stat
+RDL_MFI_STABILITY$bg # Nulll hypotheis is no serial Correlation 
+RDL_MFI_STABILITY$lb # null our model does not show lack of fit 
+RDL_MFI_STABILITY$bp # Homoskedasticity 
+RDL_MFI_STABILITY$sp
 
 # Nonlinear Bounds Test 
 
