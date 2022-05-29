@@ -113,3 +113,73 @@ Research_Data$date_ts<-seq(as.Date("1996/1/1"), as.Date("2019/12/1"), by = "quar
 Research_Data$IMFDummy<- ifelse(Research_Data$date_ts>="2008-07-01", 1, 0)
 Research_Data$IMPUDummy<- ifelse(Research_Data$date_ts>="2010-07-01", 1, 0)
 summary(Research_Data)
+
+# Linear ARDL MODELS 
+library(ARDL)
+ARDL_IMPU_MODEL_order<-auto_ardl(lnarrivalcad ~ lnimpu  +lnindustprocad + lnrepexcad + lnspexrmexuk|IMPUDummy, data = Research_Data,  max_order = c(4,4,4,4,4), selection = "BIC")
+ARDL_IMPU_MODEL_order$best_order # used to select the BIC selected order NB.lowest BIC 
+ARDL_IMPU_MODEL_order$top_orders
+
+# Linear ARDL model IMPU 
+
+ARDL_IMPU_MODEL<-ardl(lnarrivalcad ~ lnimpu  +lnindustprocad + lnrepexcad + lnspexrmexuk|IMPUDummy, data = Research_Data,  order = c(4,4,4,4,4))
+summary(ARDL_IMPU_MODEL)
+tbound_ARDL_IMPU_MODEL<-bounds_t_test(ARDL_IMPU_MODEL, case=3, alpha = 0.01)
+tbound_ARDL_IMPU_MODEL
+tbound_ARDL_IMPU_MODEL$tab
+fbound_ARDL_IMPU_MODEL<-bounds_f_test(ARDL_IMPU_MODEL, case = 3)
+fbound_ARDL_IMPU_MODEL
+fbound_ARDL_IMPU_MODEL$tab
+
+# Cointegration model and ECM case 3 is model with intercept commonly use in economics 4 is with trend 
+ARDL_IMPU_MODEL_coint<-coint_eq(ARDL_IMPU_MODEL, case = 3)
+ARDL_IMPU_MODEL_coint_ECM<-uecm(ARDL_IMPU_MODEL) # provides short run and long run estimates 
+summary(ARDL_IMPU_MODEL_coint_ECM)
+
+ARDL_IMPU_MODEL_coint_shortrun<-coint_eq(ARDL_IMPU_MODEL_coint_ECM, case = 3)
+ARDL_IMPU_MODEL_coint_shortrun_recm<-recm(ARDL_IMPU_MODEL_coint_ECM, case = 3) # provides the short run estimates 
+summary(ARDL_IMPU_MODEL_coint_shortrun_recm)
+
+# use to get the same results 
+
+mult_ARDL_IMPU_MODEL_Coint<-multipliers(ARDL_IMPU_MODEL)
+summary(ARDL_MFI_MODEL)
+
+mult_ARDL_IMPU_MODEL_Ecm<-multipliers(ARDL_IMPU_MODEL_coint_ECM) # long run estimate 
+mult_ARDL_IMPU_MODEL_Ecm
+
+
+# # Linear ARDL model MFI 
+
+ARDL_MFI_MODEL_order<-auto_ardl(lnarrivalcad ~ lnimfear  +lnindustprocad + lnrepexcad + lnspexrmexuk|IMFDummy, data = Research_Data,  max_order = c(4,4,4,4,4), selection = "BIC")
+ARDL_MFI_MODEL_order$best_order # used to select the BIC selected order NB.lowest BIC 
+ARDL_MFI_MODEL_order$top_orders
+
+ARDL_MFI_MODEL<-ardl(lnarrivalcad ~ lnimfear  +lnindustprocad + lnrepexcad + lnspexrmexuk|IMFDummy, data = Research_Data,  order = c(4,4,4,4,4))
+summary(ARDL_MFI_MODEL)
+tbound_ARDL_MFI_MODEL<-bounds_t_test(ARDL_MFI_MODEL, case=3, alpha = 0.01)
+tbound_ARDL_MFI_MODEL
+tbound_ARDL_MFI_MODEL$tab
+fbound_ARDL_MFI_MODEL<-bounds_f_test(ARDL_MFI_MODEL, case = 3)
+fbound_ARDL_MFI_MODEL
+fbound_ARDL_MFI_MODEL$tab
+
+ARDL_MFI_MODEL_coint<-coint_eq(ARDL_MFI_MODEL, case = 3)
+ARDL_MFI_MODEL_coint_ECM<-uecm(ARDL_MFI_MODEL) # provides short run and long run estimates 
+summary(ARDL_MFI_MODEL_coint_ECM)
+
+ARDL_MFI_MODEL_coint_shortrun<-coint_eq(ARDL_MFI_MODEL_coint_ECM, case = 3)
+ARDL_MFI_MODEL_coint_shortrun_recm<-recm(ARDL_MFI_MODEL_coint_ECM, case = 3) # provides the short run estimates 
+summary(ARDL_MFI_MODEL_coint_shortrun_recm)
+
+# use to get the same results 
+
+mult_ARDL_MFI_MODEL_Coint<-multipliers(ARDL_MFI_MODEL)
+mult_ARDL_MFI_MODEL_Coint
+
+mult_ARDL_MFI_MODEL_Ecm<-multipliers(ARDL_MFI_MODEL_coint_ECM) # long run estimate 
+mult_ARDL_MFI_MODEL_Ecm
+
+
+# Nonlinear Bounds Test 
+
